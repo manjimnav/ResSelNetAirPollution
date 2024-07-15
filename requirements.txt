@@ -8,5 +8,5 @@ seaborn
 tqdm
 tensorflow
 torch
-pytorch-forecasting
 lightning
+wandb

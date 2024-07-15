@@ -13,11 +13,8 @@ hostname
 # Load any necessary modules
 # Loading modules in the script ensures a consistent environment.
 source /etc/profile
-ml TensorFlow/2.11.0-foss-2022a-CUDA-11.8.0
+source venv/bin/activate
 
-export PYTHONPATH="$PYTHONPATH:/home/manjimnav1/lib"
-
-echo $PYTHONPATH
 # Launch the executable 
-python experiment.py
+python -u experiment.py
 

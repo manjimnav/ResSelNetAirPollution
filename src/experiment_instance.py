@@ -163,8 +163,11 @@ class ExperimentInstance:
 
         if model_name == 'lasso':
             importances = model.coef_.max(axis=0)
-        else:
+        elif model_name == 'decisiontree':
             importances = model.feature_importances_
+        else:
+            importances = np.ones(len(features_idxs))
+
         self.selected_idxs = {"level0": features_idxs[importances>0]}
 
         return model, None

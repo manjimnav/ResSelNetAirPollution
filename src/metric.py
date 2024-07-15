@@ -89,8 +89,9 @@ class MetricCalculator():
             self.inputs_test = self.dataset.data_test["data"][0]
             self.inputs_valid = self.dataset.data_valid["data"][0]
             
-            n_instances = self.dataset.data_test["data"][1]
-            true_scaled, true_valid_scaled = self.dataset.data_test["data"][1].reshape(n_instances, -1), self.dataset.data_valid["data"][1].reshape(n_instances, -1)
+            n_instances_test = self.dataset.data_test["data"][1].shape[0]
+            n_instances_valid = self.dataset.data_valid["data"][1].shape[0]
+            true_scaled, true_valid_scaled = self.dataset.data_test["data"][1].reshape(n_instances_test, -1), self.dataset.data_valid["data"][1].reshape(n_instances_valid, -1)
         else:
             data_test_numpy = dataset_to_numpy_array(self.dataset.data_test)["data"] if not isinstance(self.dataset.data_test, np.ndarray) else self.dataset.data_test
             data_valid_numpy = dataset_to_numpy_array(self.dataset.data_valid)["data"] if not isinstance(self.dataset.data_valid, np.ndarray) else self.dataset.data_valid
@@ -99,8 +100,8 @@ class MetricCalculator():
             true_scaled, true_valid_scaled = data_test_numpy[1], data_valid_numpy[1]
 
         if self.dataset.model_type != "pytorch":
-            predictions = model.predict(self.inputs_test)
-            predictions_valid = model.predict(self.inputs_valid)
+            predictions = model.predict(self.inputs_test.reshape(self.inputs_test.shape[0], -1))
+            predictions_valid = model.predict(self.inputs_valid.reshape(self.inputs_valid.shape[0], -1))
         else:
             predictions = model(torch.tensor(self.inputs_test), torch.tensor(true_scaled)).cpu().detach().numpy()
             predictions_valid = model(torch.tensor(self.inputs_valid), torch.tensor(true_valid_scaled)).cpu().detach().numpy()
