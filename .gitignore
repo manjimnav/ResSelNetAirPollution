@@ -1,0 +1,10 @@
+/data
+/results
+*.pyc
+figures
+.vscode/launch.json
+.ipynb_checkpoints
+checkpoints/
+wandb/
+configuration/airpollution/experiment_hyperparameters/
+tables/

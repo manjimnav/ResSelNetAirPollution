@@ -1,0 +1,7 @@
+airpollution:
+  seq_len:
+    - 24
+    - 168
+  pred_len: 24
+  shift: 24
+  crossval: True
