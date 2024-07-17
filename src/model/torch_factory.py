@@ -1,5 +1,5 @@
 import torch
-from .torch_models import FullyConnected, LSTM
+from .torch_models import FullyConnected, LSTM, FullyConnectedTSL, LSTMTSL
 import lightning as L
 
 class LightningWrapper(L.LightningModule):
@@ -17,6 +17,10 @@ class LightningWrapper(L.LightningModule):
         output = self(inputs, target)
 
         loss = torch.nn.functional.mse_loss(output.view(-1), target.view(-1))
+
+        if self.model.custom_loss is not None:
+            loss += self.model.custom_loss
+
         self.log("train/loss", loss)
         return loss
     
@@ -40,9 +44,12 @@ def get_torch_model(parameters: dict, n_features_in, n_features_out) -> torch.nn
             model = LightningWrapper(FullyConnected(parameters, n_features_in=n_features_in, n_features_out=n_features_out), parameters)
         if parameters['model']['name'] == "lstm":          
             model = LightningWrapper(LSTM(parameters, n_features_in=n_features_in, n_features_out=n_features_out), parameters)
-    elif 'TimeSelectionLayer' in selection_name and not residual:
-        raise NotImplementedError()
-    elif 'TimeSelectionLayer' in selection_name and residual:
+    elif 'TimeSelectionLayer' in selection_name:
+        if parameters['model']['name'] == "dense":          
+            model = LightningWrapper(FullyConnectedTSL(parameters, n_features_in=n_features_in, n_features_out=n_features_out), parameters)
+        if parameters['model']['name'] == "lstm":          
+            model = LightningWrapper(LSTMTSL(parameters, n_features_in=n_features_in, n_features_out=n_features_out), parameters)
+    else:
         raise NotImplementedError()
 
     return model

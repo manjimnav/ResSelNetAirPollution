@@ -1,6 +1,7 @@
 import torch
 from torch import nn
 from .initializer import init_weights
+from .layer import TimeSelectionLayer
 
 class FullyConnected(nn.Module):
     def __init__(self, parameters: dict,  n_features_in: int, n_features_out: int):
@@ -10,7 +11,8 @@ class FullyConnected(nn.Module):
         n_units = parameters['model']['params']['units']
         dropout = parameters['model']['params']['dropout']
         self.pred_len = parameters['dataset']['params']['pred_len']
-        seq_len = parameters['dataset']['params']['seq_len']
+        self.seq_len = parameters['dataset']['params']['seq_len']
+        selection_name = parameters['selection']['name']
         self.n_features_in = n_features_in
         self.n_features_out = n_features_out
 
@@ -22,8 +24,6 @@ class FullyConnected(nn.Module):
         module_list.append(nn.Linear(n_units, self.n_features_out*self.pred_len))
 
         self.sequential = nn.Sequential(*module_list)
-
-        init_weights(self.sequential)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # x of shape: batch_size x n_timesteps_in

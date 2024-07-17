@@ -2,6 +2,7 @@
 #SBATCH --job-name=experimentation-resselnet         # create a short name for your job
 
 #SBATCH --nodes=1                # node count
+#SBATCH --nodelist=gpu08
 #SBATCH -o logs/experiments.%j.out    # Specify stdout output file (%j expands to jobId)
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=1        # cpu-cores per task (>1 if multi-threaded tasks)

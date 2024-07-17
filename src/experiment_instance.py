@@ -47,9 +47,10 @@ class ExperimentInstance:
         self.model = None
         self.label_idxs, self.values_idxs = [], []
 
+
         self.code = self.dict_hash(self.parameters)
         self.parameters["code"] = self.code
-        
+
         self.selected_idxs = []
         self.raw_results_ = []
 
@@ -65,8 +66,6 @@ class ExperimentInstance:
         dhash = hashlib.md5()
         # We need to sort arguments so {'a': 1, 'b': 2} is
         # the same as {'b': 2, 'a': 1}
-        print(pformat(dictionary, lambda value: round(value, 12)))
-
         encoded = json.dumps(pformat(dictionary, lambda value: round(value, 12)), sort_keys=True, default=self.convert).encode()
         dhash.update(encoded)
         return dhash.hexdigest()
@@ -112,7 +111,6 @@ class ExperimentInstance:
             Tuple[tf.keras.Model, tf.keras.callbacks.History]: Trained model and training history.
         """
 
-        self.wandb_logger = WandbLogger(name=f"{self.code}-{self.parameters['dataset']['params'].get('test_year', '0')}", project=self.parameters['dataset']["name"])
         early_stop_callback = EarlyStopping(monitor="val/loss", min_delta=0.00, patience=10, verbose=False, mode="min")
         checkpoint_callback = ModelCheckpoint(dirpath="checkpoints", filename=f"{self.code}-{self.parameters['dataset']['params'].get('test_year', '0')}", save_top_k=1, monitor="val/loss", mode="min")
 
@@ -123,8 +121,6 @@ class ExperimentInstance:
             train_dataloaders=self.dataset.data_train["data"],
             val_dataloaders=self.dataset.data_valid["data"]
         )
-
-        self.wandb_logger.experiment.config.update(self.parameters)
 
         if checkpoint_callback.best_model_path != "":
             best_model = model.__class__.load_from_checkpoint(checkpoint_callback.best_model_path, model=model.model)
@@ -204,8 +200,10 @@ class ExperimentInstance:
             Tuple[pd.DataFrame, tf.Tensor, tf.Tensor, tf.Tensor]: Metrics DataFrame, test data inputs, true values, and predictions.
         """
 
-        self.wandb_logger = WandbLogger(name=f"{self.code}-{self.parameters['dataset']['params'].get('test_year', '0')}", project=self.parameters['dataset']["name"])
+        self.wandb_logger = WandbLogger(name=f"{self.code}-{self.parameters['dataset']['params'].get('test_year', '0')}", project=self.parameters['dataset']["name"], offline=True)
 
+        self.wandb_logger.experiment.config.update(self.parameters)
+        
         self.dataset.preprocess()
 
         n_features_in = len(self.dataset.label_idxs) + len(self.dataset.values_idxs)

@@ -1,6 +1,7 @@
 import os
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
 
 import yaml
 import numpy as np
@@ -15,6 +16,7 @@ from tqdm.contrib import itertools
 from .experiment_instance import ExperimentInstance
 import torch
 from glob import glob
+import json
 
 class ExperimentLauncher:
 
@@ -186,11 +188,11 @@ class ExperimentLauncher:
             yield from self.bayesian_optimization(general_params)
     
     def is_performed(self, experiment, params):
-
+        
         if experiment.code in self.metrics.get('code', default=pd.Series([], dtype=str)).tolist():
             if self.optimizer == 'bayesian': # Register previous metrics performed
                 self.optimizer.register(params=params, target=-self.metrics.loc[self.metrics.code == experiment.code,'root_mean_squared_error_valid'].mean())
-                return True
+            return True
         
         return False
     
@@ -223,11 +225,11 @@ class ExperimentLauncher:
                     continue   
 
                 experiment = ExperimentInstance(params)
-
-                params_generator.set_description(str(experiment.parameters))
                 
                 if self.is_performed(experiment, params):
                     continue
+
+                print(json.dumps(experiment.parameters))
 
                 metrics = experiment.run()
 

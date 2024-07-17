@@ -1,38 +1,38 @@
-# dense:
-#   layers:
-#     - 1
-#     - 3
-#   units:
-#     - 4
-#     - 64
-#   dropout:
-#     - 0.0
-#     - 0.5
-#   batch_size:
-#     - 16
-#     - 128
-#   lr:
-#     - 0.0001
-#     - 0.01
-#   type: pytorch
+dense:
+  layers:
+    - 1
+    - 3
+  units:
+    - 4
+    - 64
+  dropout:
+    - 0.0
+    - 0.5
+  batch_size:
+    - 16
+    - 128
+  lr:
+    - 0.0001
+    - 0.01
+  type: pytorch
 
-# lstm:
-#   layers:
-#     - 1
-#     - 3
-#   units:
-#     - 4
-#     - 64
-#   dropout:
-#     - 0.0
-#     - 0.5
-#   batch_size:
-#     - 16
-#     - 128
-#   lr:
-#     - 0.0001
-#     - 0.01
-#   type: pytorch
+lstm:
+  layers:
+    - 1
+    - 3
+  units:
+    - 4
+    - 64
+  dropout:
+    - 0.0
+    - 0.5
+  batch_size:
+    - 16
+    - 128
+  lr:
+    - 0.0001
+    - 0.01
+  type: pytorch
 
 linear:
   type: sklearn
@@ -51,7 +51,7 @@ decisiontree:
   type: sklearn
 
 lasso:
-  regularization:
+  alpha:
     - 0.
     - 1.
   type: sklearn
