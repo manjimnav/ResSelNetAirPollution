@@ -20,6 +20,7 @@ class TSDataset():
         self.original_columns = self.data.drop(['year', 'tsgroup'], axis=1, errors='ignore').columns
         self.data_processed = self.data.copy()
         self.feature_names = self.get_feature_names(self.data)
+        self.target_names = self.get_target_names(self.data)
         self.label_idxs, self.values_idxs = self.get_values_and_labels_index(self.data)
         
         self.is_splitted = False
@@ -57,6 +58,18 @@ class TSDataset():
 
         features = np.array([np.core.defchararray.add(
             feature_names, ' t-'+str(i)) for i in range(seq_len, 0, -1)]).flatten()
+
+        return features
+
+    def get_target_names(self, data: pd.DataFrame):
+
+        pred_len = self.parameters['dataset']['params']['pred_len']
+
+        target_names = np.array(
+            [col for col in data.drop(['year', 'tsgroup'], axis=1, errors='ignore').columns if 'target' in col])
+
+        features = np.array([np.core.defchararray.add(
+            target_names, ' t+'+str(i)) for i in range(1, pred_len+1)]).flatten()
 
         return features
     

@@ -24,8 +24,13 @@ class LSTMTSL(nn.Module):
         self.n_features_in = n_features_in
         self.n_features_out = n_features_out
 
-        self.module_list = [nn.LSTM(n_features_in, n_units, batch_first=True, dropout=dropout) for _ in range(n_layers)]
+        layer_input_size = n_features_in
+        self.module_list = []
+        for _ in range(n_layers):
+            self.module_list.append(nn.LSTM(layer_input_size, n_units, batch_first=True, dropout=dropout))
+            layer_input_size = n_units
 
+        self.module_list = nn.ModuleList(self.module_list)
         self.output_layer = nn.Linear(n_units, self.n_features_out*self.pred_len)
 
 

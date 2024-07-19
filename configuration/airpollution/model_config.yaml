@@ -34,9 +34,6 @@ lstm:
     - 0.01
   type: pytorch
 
-linear:
-  type: sklearn
-
 knn:
   n_neighbors:
     - 2

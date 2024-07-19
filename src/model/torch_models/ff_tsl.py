@@ -17,12 +17,14 @@ class FullyConnectedTSL(nn.Module):
         self.residual = parameters['selection']["params"].get("residual", False)
 
         self.module_list = []
-
+        
+        layer_input_size = self.seq_len*n_features_in
         for _ in range(n_layers):
-            self.module_list.extend([nn.Linear(n_units, n_units)])
+            self.module_list.extend([nn.Linear(layer_input_size, n_units)])
+            layer_input_size = n_units
 
         self.output_layer = nn.Linear(n_units, self.n_features_out*self.pred_len)
-
+        self.module_list = nn.ModuleList(self.module_list)
 
         if self.residual:
             self.input_tsl = TimeSelectionLayer((self.seq_len*n_features_in,), self.n_features_out*self.pred_len, parameters['selection']["params"]["regularization"])

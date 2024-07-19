@@ -114,7 +114,7 @@ class ExperimentInstance:
         early_stop_callback = EarlyStopping(monitor="val/loss", min_delta=0.00, patience=10, verbose=False, mode="min")
         checkpoint_callback = ModelCheckpoint(dirpath="checkpoints", filename=f"{self.code}-{self.parameters['dataset']['params'].get('test_year', '0')}", save_top_k=1, monitor="val/loss", mode="min")
 
-        trainer = Trainer(max_epochs=100, logger=self.wandb_logger, callbacks=[early_stop_callback, checkpoint_callback], enable_model_summary=False, enable_progress_bar=False)
+        trainer = Trainer(max_epochs=100, callbacks=[early_stop_callback, checkpoint_callback], enable_model_summary=False, enable_progress_bar=False)
 
         trainer.fit(
             model, 
@@ -124,10 +124,10 @@ class ExperimentInstance:
 
         if checkpoint_callback.best_model_path != "":
             best_model = model.__class__.load_from_checkpoint(checkpoint_callback.best_model_path, model=model.model)
-            best_model.eval()
+            best_model.eval().to('cpu')
         else:
             best_model = model
-            best_model.eval()
+            best_model.eval().to('cpu')
             
         if 'TimeSelectionLayer' in self.parameters['selection']['name']:
             #self.selected_idxs = get_selected_idxs(model, self.dataset.feature_names)
@@ -200,9 +200,9 @@ class ExperimentInstance:
             Tuple[pd.DataFrame, tf.Tensor, tf.Tensor, tf.Tensor]: Metrics DataFrame, test data inputs, true values, and predictions.
         """
 
-        self.wandb_logger = WandbLogger(name=f"{self.code}-{self.parameters['dataset']['params'].get('test_year', '0')}", project=self.parameters['dataset']["name"], offline=True)
+        #self.wandb_logger = WandbLogger(name=f"{self.code}-{self.parameters['dataset']['params'].get('test_year', '0')}", project=self.parameters['dataset']["name"], offline=True)
 
-        self.wandb_logger.experiment.config.update(self.parameters)
+        #self.wandb_logger.experiment.config.update(self.parameters)
         
         self.dataset.preprocess()
 
@@ -219,9 +219,9 @@ class ExperimentInstance:
 
         metrics = metric_calculator.export_metrics(self.model, history, duration)
 
-        self.wandb_logger.log_metrics(metrics.to_dict())
+        #self.wandb_logger.log_metrics(metrics.to_dict())
 
-        self.wandb_logger.log_table(key="metrics", dataframe=metrics)
+        #self.wandb_logger.log_table(key="metrics", dataframe=metrics)
 
         wandb.finish()
 
@@ -231,7 +231,7 @@ class ExperimentInstance:
         if "year" in self.dataset.data.columns:
             dates = pd.date_range(datetime(self.dataset.data["year"].max(), 1, 1) + timedelta(hours=self.parameters['dataset']['params']['seq_len']), datetime(test_year, 12, 31), freq='h')
             dates = dates[:len(metric_calculator.true_test)]
-            self.raw_results_.append((dates, metric_calculator.inputs_test, metric_calculator.true_test, metric_calculator.predictions_test))
+            self.raw_results_.append((test_year, dates, metric_calculator.inputs_test, metric_calculator.true_test, metric_calculator.predictions_test))
         else:
             self.raw_results_.append((metric_calculator.inputs_test, metric_calculator.true_test, metric_calculator.predictions_test))
 

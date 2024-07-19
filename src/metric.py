@@ -117,8 +117,7 @@ class MetricCalculator():
 
         metrics = self.include_metadata(metrics, history, duration)
 
-        self.true_test = true.flatten()
-        self.predictions_test = predictions.flatten()
-        self.true_test = true_scaled
+        self.true_test = true
+        self.predictions_test = predictions
         
         return metrics

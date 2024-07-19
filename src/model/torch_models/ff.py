@@ -18,8 +18,10 @@ class FullyConnected(nn.Module):
 
         module_list = []
 
+        layer_input_size = self.seq_len*n_features_in
         for _ in range(n_layers):
-            module_list.extend([nn.Linear(n_units, n_units), nn.ReLU(), nn.Dropout(dropout)])
+            module_list.extend([nn.Linear(layer_input_size, n_units), nn.ReLU(), nn.Dropout(dropout)])
+            layer_input_size = n_units
 
         module_list.append(nn.Linear(n_units, self.n_features_out*self.pred_len))
 

@@ -5,6 +5,7 @@ import lightning as L
 class LightningWrapper(L.LightningModule):
     def __init__(self, model, params):
         super().__init__()
+
         self.model = model
         self.lr = params['model']['params']['lr']
         self.save_hyperparameters(ignore=['model'])
@@ -18,7 +19,7 @@ class LightningWrapper(L.LightningModule):
 
         loss = torch.nn.functional.mse_loss(output.view(-1), target.view(-1))
 
-        if self.model.custom_loss is not None:
+        if hasattr(self.model, 'custom_loss'):
             loss += self.model.custom_loss
 
         self.log("train/loss", loss)
