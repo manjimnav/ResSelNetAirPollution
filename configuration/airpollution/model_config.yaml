@@ -34,6 +34,21 @@ lstm:
     - 0.01
   type: pytorch
 
+tcn:
+  nb_filters:
+    - 16
+    - 128
+  dilations:
+    - 1
+    - 32
+  dropout:
+    - 0.0
+    - 0.5
+  lr:
+    - 0.0001
+    - 0.01
+  type: tensorflow
+
 knn:
   n_neighbors:
     - 2

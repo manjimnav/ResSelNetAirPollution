@@ -7,9 +7,20 @@ class BaseModel(tf.keras.Model):
         super().__init__()
         self.parameters = parameters
         self.model = parameters['model']['name']
-        self.n_layers = parameters['model']['params']['layers']
-        self.n_units = parameters['model']['params']['units']
+
+        self.n_layers = None
+        self.n_units = None
+
+        if self.model in ['lstm', 'dense']:
+            self.n_layers = parameters['model']['params']['layers']
+            self.n_units = parameters['model']['params']['units']
+
+        elif self.model == 'tcn':
+            self.nb_filters = parameters['model']['params']['nb_filters']
+            self.dilations = parameters['model']['params']['dilations']
+
         self.dropout = parameters['model']['params']['dropout']
+
         self.pred_len = parameters['dataset']['params']['pred_len']
         self.seq_len = parameters['dataset']['params']['seq_len']
 
@@ -23,6 +34,14 @@ class BaseModel(tf.keras.Model):
             self.hidden_layers = [self.BASE_LAYER(self.n_units, name=f'layer_{i}') for i in range(self.n_layers)]
             self.reshape_layer = layers.Reshape((self.seq_len*n_features_in, ), name='inputs_reshaped') # We expect the input size to be seq_len*feat_dim. So we transform it to (seq_len, feat_dim)
 
+        elif self.model == 'tcn':
+          self.reshape_layer = layers.Reshape((self.seq_len, n_features_in), name='inputs_reshaped')
+          # Para TCN normalmente usas una sola capa TCN con parámetros nb_filters y dilations
+          self.hidden_layers = [self.BASE_LAYER(nb_filters=self.nb_filters,
+                                          dilations=self.dilations,
+                                          dropout_rate=self.dropout,
+                                          name='tcn_layer')]
+        
         else:
 
             self.hidden_layers = [self.BASE_LAYER(self.n_units, name=f'layer_{i}', return_sequences=True if i<(self.n_layers-1) else False) for i in range(self.n_layers)]

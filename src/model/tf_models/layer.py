@@ -4,6 +4,7 @@ from functools import partial
 from typing import Type
 import numpy as np
 from tensorflow.keras import initializers
+import tcn
 
 def hard_sigmoid(x: tf.Tensor) -> tf.Tensor:
     """
@@ -120,7 +121,7 @@ def get_base_layer(layer_type: str) -> Type[tf.keras.layers.Layer]:
     Get the base layer function based on the layer type.
 
     Args:
-        layer_type (str): The type of layer ('dense', 'lstm', or 'cnn').
+        layer_type (str): The type of layer ('dense', 'lstm', 'cnn' or 'tcn').
 
     Returns:
         callable: The base layer function.
@@ -132,6 +133,9 @@ def get_base_layer(layer_type: str) -> Type[tf.keras.layers.Layer]:
     elif layer_type == 'cnn':
         BASE_LAYER = partial(tf.keras.layers.Conv1D, kernel_size=3, kernel_initializer=initializers.HeUniform(seed=123), bias_initializer=initializers.Zeros())
 
+    elif layer_type == 'tcn':
+        BASE_LAYER = partial(tcn.TCN, activation='relu', kernel_size=3)
+    
     return BASE_LAYER
 
 def get_selected_idxs(model: tf.keras.Model, features: np.ndarray) -> set:
